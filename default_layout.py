@@ -66,4 +66,4 @@ if __name__ == '__main__':
         up, dn, lt, rt, a, b, x, y, z, r, l, ls, ms, mx, my, cu, cd, cl, cr, s, hom, sel
     ])
 
-    faceplate.to_svg('diyboxx_default')
+    faceplate.to_svg('diyb0xx-default')

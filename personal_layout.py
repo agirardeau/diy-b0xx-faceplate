@@ -70,7 +70,7 @@ if __name__ == '__main__':
         up, dn, lt, rt, a, b, x, y, z, r, l, ls, ms, mx, my, cu, cd, cl, cr, du, dd, dl, dr, s
     ])
 
-    faceplate.to_svg('diyboxx')
+    faceplate.to_svg('diyb0xx-personal')
 
     
 
