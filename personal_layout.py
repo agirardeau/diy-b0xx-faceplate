@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
     # Left Thumb
     mx = a.reflected_horizontal()
-    my = cd.reflected_horizontal()
+    my = cd.reflected_horizontal().rotated(-14).translated(-1/32, 0)
 
     # D-pad
     du = KeyMount(-2.3, 5.7, -45)
@@ -61,9 +61,15 @@ if __name__ == '__main__':
     # Start
     s = KeyMount(-WIDTH/2 + BORDER_WIDTH + KEY_WIDTH/1.5, HEIGHT - BORDER_WIDTH - 3/8)
 
-    faceplate = Faceplate(WIDTH, HEIGHT, [
-        up, dn, lt, rt, a, b, x, y, z, r, l, ls, ms, mx, my, cu, cd, cl, cr, du, dd, dl, dr, s
-    ])
+    faceplate = Faceplate(
+            WIDTH,
+            HEIGHT,
+            [
+                up, dn, lt, rt, a, b, x, y, z, r, l, ls, ms, mx, my, cu, cd, cl, cr, du, dd, dl, dr, s
+            ],
+            mounting_hole_buffer = 1/4,
+            mounting_hole_top_distance = 4.8
+    )
 
     faceplate.to_svg('diyb0xx-personal')
 

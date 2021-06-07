@@ -23,10 +23,6 @@ def str_dict(d):
 
 KEY_WIDTH = mm2in(14)
 
-MOUNTING_HOLE_DIAMETER = 1/5
-MOUNTING_HOLE_BUFFER = 1/8     # distance from closest edge
-MOUNTING_HOLE_ELEVATION = 9/10 # side hole distance from top/bottom edge
-
 DEFAULT_STYLE = 'fill:none;stroke:#000000;stroke-width:0.01'
 
 @dataclass
@@ -103,7 +99,12 @@ class Faceplate:
     keymounts: list
     corner_rounding: float = 1/10
     include_mounting_holes: bool = True
-    units = 'in'
+    units: str = 'in'
+    mounting_hole_diameter: float = 1/5
+    mounting_hole_buffer: float = 1/8     # distance from closest edge
+    mounting_hole_elevation: float = 9/10 # side hole distance from top/bottom edge
+    mounting_hole_top_distance: float = None # distance between two top holes, if want two
+
 
     def to_svg(self, name):
         g = ET.Element('g', {'transform': 'scale(1 -1)'})
@@ -121,7 +122,7 @@ class Faceplate:
 
         if self.include_mounting_holes:
             for x, y in self.mounting_hole_locations():
-                g.append(ET.Element('circle', str_dict({'cx': x, 'cy': y, 'r': MOUNTING_HOLE_DIAMETER / 2, 'style': DEFAULT_STYLE})))
+                g.append(ET.Element('circle', str_dict({'cx': x, 'cy': y, 'r': self.mounting_hole_diameter / 2, 'style': DEFAULT_STYLE})))
 
         svg = ET.Element('svg', inkscape_svgargs(self.width, self.height, self.units))
         svg.append(ET.Element('sodipodi:namedview', namedview_svgargs(self.width, self.height)))
@@ -135,17 +136,27 @@ class Faceplate:
         doc.write(f'{name}.svg', encoding='utf-8', xml_declaration=True)
 
     def mounting_hole_locations(self):
-        dist_from_close_edge = MOUNTING_HOLE_BUFFER + MOUNTING_HOLE_DIAMETER / 2
-        dist_from_far_edge = MOUNTING_HOLE_ELEVATION + MOUNTING_HOLE_BUFFER / 2
+        dist_from_close_edge = self.mounting_hole_buffer + self.mounting_hole_diameter / 2
+        dist_from_far_edge = self.mounting_hole_elevation + self.mounting_hole_buffer / 2
 
-        return [
+        holes = [
                 (0, dist_from_close_edge),
-                (0, self.height - dist_from_close_edge),
                 (self.width / 2 - dist_from_close_edge, dist_from_far_edge),
                 (self.width / 2 - dist_from_close_edge, self.height - dist_from_far_edge),
                 (-self.width / 2 + dist_from_close_edge, dist_from_far_edge),
                 (-self.width / 2 + dist_from_close_edge, self.height - dist_from_far_edge),
         ]
+
+        if self.mounting_hole_top_distance is not None:
+            pass
+            holes.extend([
+                (-self.mounting_hole_top_distance / 2, self.height - dist_from_close_edge),
+                (self.mounting_hole_top_distance / 2, self.height - dist_from_close_edge),
+            ])
+        else:
+            holes.append((0, self.height - dist_from_close_edge))
+
+        return holes
         
 
 
