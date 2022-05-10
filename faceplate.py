@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 import xml.etree.ElementTree as ET
 
 # Coordinate system: X is right, Y is up, the origin is at the center of the
-# bottom of the faceplat. Key rotation is zero for normal orientation, positive
+# bottom of the faceplate. Key rotation is zero for normal orientation, positive
 # for leftward tilt and negative for rightward tilt.
 # Units are inches and degrees.
 # Translation to svg coordinates (X left, Y down) happens on export.
@@ -14,6 +14,9 @@ def sind(degrees):
 
 def cosd(degrees):
     return math.cos(math.radians(degrees))
+
+def atand(ratio):
+    return math.degrees(math.atan(ratio))
 
 def mm2in(mm):
     return mm / 25.4
@@ -100,10 +103,10 @@ class Faceplate:
     corner_rounding: float = 1/10
     include_mounting_holes: bool = True
     units: str = 'in'
-    mounting_hole_diameter: float = 1/5
-    mounting_hole_buffer: float = 1/8     # distance from closest edge
-    mounting_hole_elevation: float = 9/10 # side hole distance from top/bottom edge
-    mounting_hole_top_distance: float = None # distance between two top holes, if want two
+    mounting_hole_diameter: float = (1/5) * 1.02  # 2% margin so post screws fit
+    mounting_hole_buffer: float = 1/8             # distance from closest edge
+    mounting_hole_elevation: float = 9/10         # side hole distance from top/bottom edge
+    mounting_hole_top_distance: float = None      # distance between two top holes, if want two
 
 
     def to_svg(self, name):

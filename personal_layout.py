@@ -7,50 +7,60 @@ HEIGHT = 8
 BORDER_WIDTH = 3/4
 
 HAND_TILT = 15 
-ADDITIONAL_THUMB_TILT = 0
+ADDITIONAL_THUMB_TILT = 25
 
+KEYCAP_LENGTH = 5/7 # 18.15mm, from spec
 KEYS_HORIZONTAL_DIST = 13/16
 KEYS_VERTICAL_DIST = 13/16
+KEYS_VERTICAL_MARGIN = KEYS_VERTICAL_DIST - KEYCAP_LENGTH
+KEYS_VERTICAL_DIST_SHORT = KEYS_VERTICAL_DIST - KEYS_VERTICAL_MARGIN * 2/3
 
 MIDDLE_FINGER_ELEVATION = 7/32
-PINKY_DECLINATION = 17/32
+RING_FINGER_DECLINATION = 1/8
+PINKY_DECLINATION = 25/32
 CDOWN_DECLINATION = 3/8
 CUP_VERTICAL_DISTANCE = KEYS_VERTICAL_DIST
 
 EFFECTIVE_BORDER = BORDER_WIDTH + 9/16
 
 if __name__ == '__main__':
-    ms_x = WIDTH / 2 - EFFECTIVE_BORDER - 1/8
-    ms_y = HEIGHT - EFFECTIVE_BORDER - max(
-            (PINKY_DECLINATION + KEYS_VERTICAL_DIST) * cosd(HAND_TILT) - KEYS_HORIZONTAL_DIST * sind(HAND_TILT),
-            (PINKY_DECLINATION + 2 * KEYS_VERTICAL_DIST) * cosd(HAND_TILT) - 3 * KEYS_HORIZONTAL_DIST * sind(HAND_TILT))
+    l_x = WIDTH / 2 - EFFECTIVE_BORDER - 1/8
+    l_y = HEIGHT - EFFECTIVE_BORDER + 1/16 - max(
+            (PINKY_DECLINATION - RING_FINGER_DECLINATION + KEYS_VERTICAL_DIST_SHORT) * cosd(HAND_TILT) - KEYS_HORIZONTAL_DIST * sind(HAND_TILT),  # Ring Finger
+            (PINKY_DECLINATION + KEYS_VERTICAL_DIST_SHORT) * cosd(HAND_TILT) - 3 * KEYS_HORIZONTAL_DIST * sind(HAND_TILT))  # Index Finger
 
     # Right Hand
-    ms = KeyMount(ms_x, ms_y, HAND_TILT)
-    l = ms.translated(0, KEYS_VERTICAL_DIST)
-    ls = ms.translated(-KEYS_HORIZONTAL_DIST, PINKY_DECLINATION)
-    z = ls.translated(0, KEYS_VERTICAL_DIST)
-    y = z.translated(-KEYS_HORIZONTAL_DIST, MIDDLE_FINGER_ELEVATION)
-    b = ls.translated(-2 * KEYS_HORIZONTAL_DIST, 0)
-    r = b.translated(0, KEYS_VERTICAL_DIST)
-    x = r.translated(0, KEYS_VERTICAL_DIST)
+    l = KeyMount(l_x, l_y, HAND_TILT)
+    z = l.translated(-KEYS_HORIZONTAL_DIST, PINKY_DECLINATION - RING_FINGER_DECLINATION)
+    x = z.translated(-KEYS_HORIZONTAL_DIST, RING_FINGER_DECLINATION + MIDDLE_FINGER_ELEVATION)
+    r = x.translated(-KEYS_HORIZONTAL_DIST, -MIDDLE_FINGER_ELEVATION)
+
+    ls = l.translated(0, KEYS_VERTICAL_DIST_SHORT)
+    ms = z.translated(0, KEYS_VERTICAL_DIST_SHORT)
+    y = r.translated(0, KEYS_VERTICAL_DIST_SHORT)
+    b = r.translated(0, -KEYS_VERTICAL_DIST)
 
     # Right Thumb
-    a = y.translated(-(2+1/16), -(2+11/16)).rotated(ADDITIONAL_THUMB_TILT)
-    cd = a.translated(-KEYS_HORIZONTAL_DIST, -CDOWN_DECLINATION)
-    cl = cd.translated(0, CUP_VERTICAL_DISTANCE)
-    cu = a.translated(0, CUP_VERTICAL_DISTANCE)
-    cr = cl.translated(2 * KEYS_HORIZONTAL_DIST, 0)
+    cu = x.translated(-(2+1/16), -(1+7/8)).rotated(ADDITIONAL_THUMB_TILT)
+    cl = cu.translated(-KEYS_HORIZONTAL_DIST, 0)
+    cr = cu.translated(KEYS_HORIZONTAL_DIST / 2, -KEYS_VERTICAL_DIST - 1.5 * KEYS_VERTICAL_MARGIN)
+    cd = cl.translated(-KEYS_HORIZONTAL_DIST / 2, -KEYS_VERTICAL_DIST - 1.5 * KEYS_VERTICAL_MARGIN)
+    a = cu.translated(-KEYS_HORIZONTAL_DIST / 2, -KEYS_VERTICAL_DIST - 1.5 * KEYS_VERTICAL_MARGIN)
+
+    cu = cu.rotated(-24)
+    cl = cl.rotated(-12)
+    cr = cr.rotated(-12)
+    cd = cd.rotated(12)
 
     # Left Hand
     rt = r.reflected_horizontal()
-    dn = y.reflected_horizontal()
+    dn = x.reflected_horizontal()
     lt = z.reflected_horizontal()
     up = l.reflected_horizontal()
 
     # Left Thumb
-    mx = a.reflected_horizontal()
-    my = cd.reflected_horizontal().rotated(-14).translated(-1/32, 0)
+    mx = dn.translated((1+7/8), -(2+11/16))
+    my = mx.translated(KEYS_HORIZONTAL_DIST - 1/16, -3/8).rotated(-14)
 
     # D-pad
     du = KeyMount(-2.3, 5.7, -45)
